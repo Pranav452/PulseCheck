@@ -70,6 +70,9 @@ export default function LoginPage() {
       // Use the auth context method
       await login(formData)
       console.log("Login successful via context");
+      
+      // Force navigation to dashboard 
+      window.location.href = "/dashboard";
     } catch (error) {
       console.error("Login error:", error);
       toast({

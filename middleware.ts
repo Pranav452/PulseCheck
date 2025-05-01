@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
 
     // Check auth condition
     const isAuthenticated = !!session;
-    console.log("Middleware: Is authenticated:", isAuthenticated);
+    console.log("Middleware: Is authenticated:", isAuthenticated, "User:", session?.user?.email);
     
     const isAuthPage = 
       request.nextUrl.pathname === "/login" || 
@@ -42,7 +42,9 @@ export async function middleware(request: NextRequest) {
     if (isAuthPage) {
       if (isAuthenticated) {
         console.log("Middleware: Redirecting to dashboard from auth page");
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        const dashboardUrl = new URL("/dashboard", request.url);
+        console.log("Middleware: Redirect URL:", dashboardUrl.toString());
+        return NextResponse.redirect(dashboardUrl);
       }
       return NextResponse.next();
     }
@@ -50,15 +52,13 @@ export async function middleware(request: NextRequest) {
     // Protected routes - only enforce in production
     // In development, we'll allow the user to view the dashboard pages
     // even without auth for easier debugging
-    if (process.env.NODE_ENV === 'production') {
-      const isProtectedRoute = 
-        request.nextUrl.pathname.startsWith("/dashboard") || 
-        request.nextUrl.pathname.startsWith("/onboarding");
+    const isProtectedRoute = 
+      request.nextUrl.pathname.startsWith("/dashboard") || 
+      request.nextUrl.pathname.startsWith("/onboarding");
 
-      if (isProtectedRoute && !isAuthenticated) {
-        console.log("Middleware: Redirecting to login from protected route");
-        return NextResponse.redirect(new URL("/login", request.url));
-      }
+    if (isProtectedRoute && !isAuthenticated) {
+      console.log("Middleware: Redirecting to login from protected route");
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
     return NextResponse.next();
