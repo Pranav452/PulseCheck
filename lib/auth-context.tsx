@@ -46,6 +46,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const user = await authService.getCurrentUser()
           console.log("AuthProvider: User retrieved", user);
           setUser(user)
+          
+          // Check if we're on login/signup page and redirect if needed
+          if (window.location.pathname === '/login' || window.location.pathname === '/signup' || window.location.pathname === '/') {
+            console.log("AuthProvider: Redirecting authenticated user to dashboard");
+            window.location.href = "/dashboard";
+          }
         } catch (userError) {
           console.error("AuthProvider: Error retrieving user", userError);
         }

@@ -3,8 +3,27 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ArrowRight, BarChart2, CheckCircle, ChevronRight, Globe, Lock, MessageSquare, PieChart, Users } from "lucide-react"
+import { useEffect } from "react"
+import { supabase } from "@/lib/supabase"
 
 export default function Home() {
+  // Check if user is already logged in and redirect to dashboard
+  useEffect(() => {
+    const checkAndRedirect = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.log("Home page: User already logged in, redirecting to dashboard");
+          window.location.href = "/dashboard";
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
+      }
+    };
+
+    checkAndRedirect();
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col bg-[#f2f8e6] font-mono text-black">
       {/* Header */}

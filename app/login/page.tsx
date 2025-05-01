@@ -107,6 +107,7 @@ export default function LoginPage() {
                 required
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="username email"
               />
             </div>
             <div className="space-y-2">
@@ -118,6 +119,7 @@ export default function LoginPage() {
                 required
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="current-password"
               />
             </div>
           </CardContent>
