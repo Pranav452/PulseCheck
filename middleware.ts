@@ -34,6 +34,11 @@ export async function middleware(request: NextRequest) {
     const isAuthenticated = !!session;
     console.log("Middleware: Is authenticated:", isAuthenticated, "User:", session?.user?.email);
     
+    // TEMPORARY: Skip auth checks and redirects to debug login flow
+    console.log("Middleware: Auth checks temporarily disabled for debugging");
+    return NextResponse.next();
+    
+    /* COMMENTED OUT FOR DEBUGGING
     const isAuthPage = 
       request.nextUrl.pathname === "/login" || 
       request.nextUrl.pathname === "/signup";
@@ -41,17 +46,30 @@ export async function middleware(request: NextRequest) {
     // Redirect based on authentication status
     if (isAuthPage) {
       if (isAuthenticated) {
+        // Check if we've already redirected (using cookies to avoid infinite redirects)
+        const redirectCookie = request.cookies.get('dashboard_redirect');
+        if (redirectCookie) {
+          console.log("Middleware: Skipping redirect to prevent loop");
+          return NextResponse.next();
+        }
+        
         console.log("Middleware: Redirecting to dashboard from auth page");
         const dashboardUrl = new URL("/dashboard", request.url);
         console.log("Middleware: Redirect URL:", dashboardUrl.toString());
-        return NextResponse.redirect(dashboardUrl);
+        const response = NextResponse.redirect(dashboardUrl);
+        
+        // Set a cookie to prevent redirect loops
+        response.cookies.set('dashboard_redirect', '1', { 
+          maxAge: 5, // Short-lived cookie (5 seconds)
+          path: '/' 
+        });
+        
+        return response;
       }
       return NextResponse.next();
     }
 
-    // Protected routes - only enforce in production
-    // In development, we'll allow the user to view the dashboard pages
-    // even without auth for easier debugging
+    // Protected routes
     const isProtectedRoute = 
       request.nextUrl.pathname.startsWith("/dashboard") || 
       request.nextUrl.pathname.startsWith("/onboarding");
@@ -60,8 +78,8 @@ export async function middleware(request: NextRequest) {
       console.log("Middleware: Redirecting to login from protected route");
       return NextResponse.redirect(new URL("/login", request.url));
     }
+    */
 
-    return NextResponse.next();
   } catch (e) {
     console.error("Middleware: Unexpected error:", e);
     return NextResponse.next();

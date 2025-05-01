@@ -54,32 +54,41 @@ export default function LoginPage() {
     console.log("Login attempt with:", formData.email);
 
     try {
-      // Direct Supabase auth for testing
+      // Show loading state
+      setConnectionStatus("Logging in...");
+      
+      // Direct Supabase auth - simplified approach
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
       });
 
       if (error) {
-        console.error("Direct auth error:", error);
+        console.error("Auth error:", error);
         throw error;
       }
 
-      console.log("Auth result:", data);
+      console.log("Auth successful:", data);
       
-      // Use the auth context method
-      await login(formData)
-      console.log("Login successful via context");
+      // Simple redirect after successful authentication
+      toast({
+        title: "Login successful",
+        description: "Redirecting to dashboard...",
+      });
       
-      // Force navigation to dashboard 
-      window.location.href = "/dashboard";
+      // Small delay before redirect to ensure session is set
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1000);
+      
     } catch (error) {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Login failed",
         description: error instanceof Error ? error.message : "Invalid email or password. Please try again.",
-      })
+      });
+      setConnectionStatus("Connected to Supabase");
     }
   }
 

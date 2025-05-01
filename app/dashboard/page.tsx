@@ -10,13 +10,15 @@ import { DateRangePicker } from "@/components/date-range-picker"
 import { activityService } from "@/lib/activity-service"
 import { teamService } from "@/lib/team-service"
 import type { Activity, Team, TeamMember } from "@/lib/types"
+import { supabase } from "@/lib/supabase"
+import { DateRange } from "react-day-picker"
 
 export default function DashboardPage() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [team, setTeam] = useState<Team | null>(null)
   const [members, setMembers] = useState<TeamMember[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [dateRange, setDateRange] = useState({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     to: new Date(),
   })
@@ -25,13 +27,27 @@ export default function DashboardPage() {
     const fetchData = async () => {
       setIsLoading(true)
       try {
+        // Check if we have a session first
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          console.error("Dashboard: No active session found");
+          window.location.href = "/login";
+          return;
+        }
+        
+        console.log("Dashboard: Session found", session.user?.email);
+        
         const currentTeam = await teamService.getCurrentTeam()
         setTeam(currentTeam)
 
         const teamMembers = await teamService.getTeamMembers(currentTeam.id)
         setMembers(teamMembers)
 
-        const teamActivities = await activityService.getTeamActivities(currentTeam.id, dateRange.from, dateRange.to)
+        const teamActivities = await activityService.getTeamActivities(
+          currentTeam.id, 
+          dateRange.from as Date, 
+          dateRange.to as Date
+        )
         setActivities(teamActivities)
       } catch (error) {
         console.error("Error fetching dashboard data:", error)
@@ -43,7 +59,7 @@ export default function DashboardPage() {
     fetchData()
   }, [dateRange])
 
-  const handleDateRangeChange = (range: { from: Date; to: Date }) => {
+  const handleDateRangeChange = (range: DateRange) => {
     setDateRange(range)
   }
 
@@ -82,8 +98,8 @@ export default function DashboardPage() {
           <TeamMetrics 
             activities={activities} 
             members={members} 
-            startDate={dateRange.from} 
-            endDate={dateRange.to}
+            startDate={dateRange.from as Date} 
+            endDate={dateRange.to as Date}
             isLoading={isLoading} 
           />
         </TabsContent>

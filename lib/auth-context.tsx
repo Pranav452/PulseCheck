@@ -49,8 +49,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           // Check if we're on login/signup page and redirect if needed
           if (window.location.pathname === '/login' || window.location.pathname === '/signup' || window.location.pathname === '/') {
-            console.log("AuthProvider: Redirecting authenticated user to dashboard");
-            window.location.href = "/dashboard";
+            // Prevent infinite redirects with a flag in sessionStorage
+            const hasRedirected = sessionStorage.getItem('auth_redirected');
+            if (hasRedirected !== 'true') {
+              console.log("AuthProvider: Redirecting authenticated user to dashboard");
+              sessionStorage.setItem('auth_redirected', 'true');
+              window.location.href = "/dashboard";
+            } else {
+              console.log("AuthProvider: Skipping redirect, already redirected");
+            }
           }
         } catch (userError) {
           console.error("AuthProvider: Error retrieving user", userError);
