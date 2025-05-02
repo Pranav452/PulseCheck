@@ -65,10 +65,10 @@ export default function Home() {
         {/* Hero Section */}
         <section className="px-8 pt-12 pb-8">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
               <div className="order-2 md:order-1">
                 <h1 className="text-4xl md:text-5xl font-bold uppercase leading-tight mb-6">
-                  Transform <span className="bg-black text-white px-2">Team</span> Collaboration
+                  Passive <span className="bg-black text-white px-2">Team</span> Activity & Collaboration Tracker
                 </h1>
                 <p className="text-sm mb-8 max-w-md">
                   Use real-time analytics to amplify team productivity, track performance, 
