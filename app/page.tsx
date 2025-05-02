@@ -5,48 +5,8 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ArrowRight, BarChart2, CheckCircle, ChevronRight, Globe, Lock, MessageSquare, PieChart, Users } from "lucide-react"
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
 
 export default function Home() {
-  const [checkingAuth, setCheckingAuth] = useState(true);
-  
-  // Check if user is already logged in and redirect to dashboard
-  useEffect(() => {
-    // Prevent infinite redirects with a flag in sessionStorage
-    const hasRedirected = sessionStorage.getItem('redirected');
-    if (hasRedirected === 'true') {
-      setCheckingAuth(false);
-      return;
-    }
-    
-    const checkAndRedirect = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          console.log("Home page: User already logged in, redirecting to dashboard");
-          sessionStorage.setItem('redirected', 'true');
-          window.location.href = "/dashboard";
-        }
-        setCheckingAuth(false);
-      } catch (error) {
-        console.error("Error checking auth status:", error);
-        setCheckingAuth(false);
-      }
-    };
-
-    checkAndRedirect();
-
-    // Clear the redirect flag when component unmounts
-    return () => {
-      sessionStorage.removeItem('redirected');
-    };
-  }, []);
-
-  if (checkingAuth) {
-    return <div className="flex min-h-screen items-center justify-center">Checking authentication...</div>;
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-[#f2f8e6] font-mono text-black">
       {/* Header */}
